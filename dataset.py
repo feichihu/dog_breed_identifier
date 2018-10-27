@@ -36,6 +36,8 @@ def get_train_val_dataset(num_classes=10):
     # Standardize
     standardizer = ImageStandardizer()
     standardizer.fit(tr.X)
+    print("..Image Mean:", standardizer.image_mean)
+    print("..Image Std: ", standardizer.image_std)
     tr.X = standardizer.transform(tr.X)
     va.X = standardizer.transform(va.X)
     te.X = standardizer.transform(te.X)
@@ -57,9 +59,12 @@ def resize(X):
     """
     # TODO: Complete this function
     image_dim = config('image_dim')
-    ???
+    Y = []
+    for image in X:
+        resized = imresize(image,[image_dim,image_dim,3],interp = 'bicubic')
+        Y.append(resized)
     #
-    return resized
+    return Y
 
 class ImageStandardizer(object):
     """
@@ -75,13 +80,23 @@ class ImageStandardizer(object):
         self.image_std = None
     
     def fit(self, X):
-        # TODO: Complete this function
-        ???
-        #
+        channel_mean = np.mean(X,axis=(1,0,2))
+        channel_std = np.std(X,axis=(0,1,2))
+        self.image_mean = channel_mean
+        self.image_std = channel_std
     
     def transform(self, X):
+        Y = []
+        for j in range(len(X)):
+            temp = X[j].astype(float)
+            for i in range(X[j].shape[2]):
+                for x in range(X[j].shape[0]):
+                    for y in range(X[j].shape[1]):
+                        temp[x][y][i] -= self.image_mean[i]
+                        temp[x][y][i] /= self.image_std[i]
+            Y.append(temp)
+        return np.array(Y)
         # TODO: Complete this function
-        ???
         #
 
 class DogsDataset(Dataset):
