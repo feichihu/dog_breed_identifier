@@ -79,8 +79,8 @@ def main():
     model = CNN()
     
     # TODO: define loss function, and optimizer
-    criterion = ???
-    optimizer = ???
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
     #
 
     print('Number of float-valued parameters:', count_parameters(model))

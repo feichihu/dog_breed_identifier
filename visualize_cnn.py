@@ -37,7 +37,7 @@ if __name__ == '__main__':
     # Attempts to restore from checkpoint
     print('Loading cnn...')
     model = CNN()
-    model, start_epoch = restore_checkpoint(model, config('cnn.checkpoint'), force=True)
+    model, start_epoch, _ = restore_checkpoint(model, config('cnn.checkpoint'), force=True)
 
     tr_loader, va_loader, te_loader, _ = get_train_val_test_loaders(num_classes=config('cnn.num_classes'))
 

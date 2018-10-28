@@ -99,6 +99,13 @@ def predictions(logits):
     Returns:
         the predicted class output as a PyTorch Tensor
     """
-    # TODO: implement this function
-    raise NotImplementedError
-    #
+    y_pred = []
+    for x in logits:
+        max = 0
+        index = -1
+        for i in range(len(x)):
+            if x[i]>max:
+                max = x[i]
+                index = i
+        y_pred.append(index)
+    return torch.LongTensor(y_pred)
