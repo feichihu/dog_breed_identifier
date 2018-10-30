@@ -105,7 +105,7 @@ def main():
 
     # Attempts to restore the latest checkpoint if exists
     print('Loading autoencoder...')
-    model, start_epoch = restore_checkpoint(model,
+    model, start_epoch, _ = restore_checkpoint(model,
         config('autoencoder.checkpoint'))
 
     # Evaluate model

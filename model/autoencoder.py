@@ -13,26 +13,30 @@ import torch.nn as nn
 import torch.nn.functional as F
 from math import sqrt
 
+cuda = torch.device('cuda')
+
 class Autoencoder(nn.Module):
     def __init__(self, repr_dim):
         super().__init__()
         self.repr_dim = repr_dim
 
         # TODO: define each layer
-        self.pool = ???
-        self.fc1 = ???
-        self.fc2 = ???
-        self.fc3 = ???
-        #
+        self.pool = nn.AvgPool2d(kernel_size = 2, stride = 2 )
+        self.fc1 = nn.Linear(768, 128)
+        self.fc2 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(64, 20736)
 
         self.deconv = nn.ConvTranspose2d(repr_dim, 3, 5, stride=2, padding=2)
         self.init_weights()
 
     def init_weights(self):
         # TODO: initialize the parameters for
-        #       [self.fc1, self.fc2, self.fc3, self.deconv]
-        
-        #
+        for conv in [self.fc1, self.fc2, self.fc3, self.deconv]:
+            C_in = conv.weight.size(1)
+            nn.init.normal_(conv.weight, 0.0, 0.1 / sqrt(C_in))
+            nn.init.constant_(conv.bias, 0.0)
+        nn.init.normal_(self.deconv.weight, 0.0, 0.01)
+        nn.init.constant_(self.deconv.bias, 0.0)
 
     def forward(self, x):
         encoded = self.encoder(x)
@@ -42,16 +46,19 @@ class Autoencoder(nn.Module):
     def encoder(self, x):
         # TODO: encoder
         N, C, H, W = x.shape
-        
-        #
-
-        return encoded
+        x = self.pool(x)
+        x = F.elu(x)
+        x = x.view(-1, 3*16*16)
+        x = self.fc1(x)
+        x = F.elu(x)
+        x = self.fc2(x)
+        x = F.elu(x)
+        return x
     
     def decoder(self, encoded):
         # TODO: decoder
-        
-        #
-
+        decoded = self.fc3(encoded)
+        z = F.elu(decoded)
         decoded = self._grow_and_crop(z)
         decoded = _normalize(decoded)
         return decoded
@@ -75,7 +82,9 @@ class AutoencoderClassifier(nn.Module):
         # TODO: define each layer
         
         #
-
+        self.pool = nn.AvgPool2d(kernel_size = 2, stride = 2 )
+        self.fc1 = nn.Linear(768, 128)
+        self.fc2 = nn.Linear(128, 64)
         self.fc_1 = nn.Linear(repr_dim, n_neurons)
         self.fc_2 = nn.Linear(n_neurons, n_neurons)
         self.fc_3 = nn.Linear(n_neurons, n_neurons)
@@ -93,10 +102,14 @@ class AutoencoderClassifier(nn.Module):
     def encoder(self, x):
         # TODO: encoder
         N, C, H, W = x.shape
-        
-        #
-        
-        return encoded
+        x = self.pool(x)
+        x = F.elu(x)
+        x = x.view(-1, 3*16*16)
+        x = self.fc1(x)
+        x = F.elu(x)
+        x = self.fc2(x)
+        x = F.elu(x)
+        return x
 
 class NaiveRecon(nn.Module):
     def __init__(self, scale):

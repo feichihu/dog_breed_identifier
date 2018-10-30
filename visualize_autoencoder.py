@@ -82,7 +82,7 @@ def main():
 
     # Restore the latest checkpoint of autoencoder
     print('Loading autoencoder...')
-    ae, _ = restore_checkpoint(ae, config('autoencoder.checkpoint'), force=True)
+    ae, _, _ = restore_checkpoint(ae, config('autoencoder.checkpoint'), force=True)
 
     # Visualize
     visualize_autoencoder(dataset, get_semantic_label, ae, naive)

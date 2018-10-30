@@ -23,12 +23,14 @@ def _train_epoch(data_loader, model, criterion, optimizer):
     # TODO: complete the training step
     for i, (X, y) in enumerate(data_loader):
         # clear parameter gradients
-        ???
+        optimizer.zero_grad()
         #
 
         # forward + backward + optimize
-        ???
-        #
+        _, output = model(X)
+        loss = criterion(output, X)
+        loss.backward()
+        optimizer.step()
     #
 
 def _evaluate_epoch(axes, tr_loader, val_loader, model, criterion, epoch, stats):
@@ -60,8 +62,8 @@ def main():
     model = Autoencoder(config('autoencoder.ae_repr_dim'))
 
     # TODO: define loss function, and optimizer
-    criterion = ???
-    optimizer = ???
+    criterion = torch.nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
     #
 
     # Attempts to restore the latest checkpoint if exists
