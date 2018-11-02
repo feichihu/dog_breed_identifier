@@ -162,6 +162,8 @@ class DogsDataset(Dataset):
         Returns the string representation of the numeric class label (e.g.,
         the numberic label 1 maps to the semantic label 'miniature_poodle').
         """
+        if(numeric_label==-1):
+            return "error"
         return self.semantic_labels[numeric_label]
 
 if __name__ == '__main__':

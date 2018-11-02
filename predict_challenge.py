@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import utils
 from dataset import get_train_val_test_loaders
-from model.challenge import ResidualBlock, Challenge
+from model.challenge import Challenge
 from train_common import *
 from utils import config
 
@@ -26,22 +26,23 @@ def predict_challenge(data_loader, model):
         predicted = predictions(output.data)
         predicted = predicted.numpy()
         model_pred = np.concatenate([model_pred, predicted])
-    return model_pred
+    return list(map(int, model_pred))
 
 def main(uniqname):
     # data loaders
     _, _, te_loader, get_semantic_label = get_train_val_test_loaders(
         num_classes=config('challenge.num_classes'))
 
-    model = Challenge(ResidualBlock)
+    model = Challenge()
 
     # Attempts to restore the latest checkpoint if exists
-    model, _ = restore_checkpoint(model, config('challenge.checkpoint'))
+    model, _, _ = restore_checkpoint(model, config('challenge.checkpoint'))
 
     # Evaluate model
     model_pred = predict_challenge(te_loader, model)
 
     print('saving challenge predictions...\n')
+    print(model_pred)
     model_pred = [get_semantic_label(p) for p in model_pred]
     pd_writer = pd.DataFrame(model_pred, columns=['predictions'])
     pd_writer.to_csv(uniqname + '.csv', index=False, header=False)

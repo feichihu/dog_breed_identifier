@@ -22,11 +22,14 @@ def _train_epoch(data_loader, model, criterion, optimizer):
     # TODO: complete the training step
     for i, (X, y) in enumerate(data_loader):
         # clear parameter gradients
-        ???
+        optimizer.zero_grad()
         #
 
         # forward + backward + optimize
-        ???
+        output = model(X)
+        loss = criterion(output, y)
+        loss.backward()
+        optimizer.step()
         #
     #
 
@@ -69,9 +72,11 @@ def main():
         num_classes=config('challenge.num_classes'))
 
     # TODO: define model, loss function, and optimizer
-    model = ???
-    criterion = ???
-    optimizer = ???
+    model = Challenge()
+    criterion = torch.nn.CrossEntropyLoss()
+    #optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+    #optimizer = torch.optim.SGD(model.parameters(), lr=0.005, momentum = 0.9)
+    optimizer = torch.optim.ASGD(model.parameters(), lr=0.01, lambd=0.001, alpha=0.75, t0=1000000.0, weight_decay=0)
     #
 
     # Attempts to restore the latest checkpoint if exists
