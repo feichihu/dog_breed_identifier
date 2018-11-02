@@ -10,6 +10,7 @@ import torch
 import numpy as np
 import random
 from dataset import get_train_val_test_loaders
+import dataset
 from model.autoencoder import Autoencoder, AutoencoderClassifier
 from train_common import *
 from utils import config
@@ -70,9 +71,20 @@ def _evaluate_epoch(axes, tr_loader, val_loader, model, criterion, epoch, stats)
     utils.log_cnn_training(epoch, stats)
     utils.update_cnn_training_plot(axes, epoch, stats)
 
+def get_data_by_label(dataset):
+    data = []
+    for i, (X, y) in enumerate(dataset):
+        for c in range(config('autoencoder.num_classes')):
+            batch = X[(y == c).nonzero().squeeze(-1)]
+            if len(data) <= c:
+                data.append(batch)
+            else:
+                data[c] = torch.cat((data[c], batch))
+    return data
+
 def main():
     # data loaders
-    tr_loader, va_loader, te_loader, _ = get_train_val_test_loaders(
+    tr_loader, va_loader, te_loader, get_semantic_label = get_train_val_test_loaders(
         num_classes=config('autoencoder.classifier.num_classes'))
 
     ae_classifier = AutoencoderClassifier(config('autoencoder.ae_repr_dim'),
@@ -114,7 +126,29 @@ def main():
             config('autoencoder.classifier.checkpoint'), stats)
 
     print('Finished Training')
-
+#reprot each class
+    dataset = get_data_by_label(va_loader)
+    len_ = 0
+    y_true = []
+    y_pred = []
+    accuracy = []
+    total = 0
+    correct = 0
+    for c in range(5):
+        X = dataset[c]
+        output = ae_classifier(X)
+        predicted = predictions(output.data)
+        y = [c]*X.shape[0]
+        y = torch.LongTensor(y)
+        y_true.append(y)
+        y_pred.append(predicted)
+        total += len(y)
+        correct += (predicted == y).sum().item()
+        accuracy.append(correct/total)
+    for c, p in enumerate(accuracy):
+        print('Class {}: {} '
+            .format(get_semantic_label(c), p)) 
+    '''finish'''
     # Keep plot open
     utils.save_cnn_training_plot()
     utils.hold_training_plot()
