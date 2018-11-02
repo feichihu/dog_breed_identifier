@@ -15,13 +15,15 @@ class Challenge(nn.Module):
         super().__init__()
         
         # TODO:
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=(5,5), stride=2, padding=2)
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=(5,5), stride=1, padding=2)
         self.conv2 = nn.Conv2d(in_channels=16, out_channels=64, kernel_size=(5,5), stride=2, padding=2)
         self.conv3 = nn.Conv2d(in_channels=64, out_channels=32, kernel_size=(5,5), stride=2, padding=2)
         self.fc1 = nn.Linear(512, 64)
         self.fc2 = nn.Linear(64, 32)
         self.fc3 = nn.Linear(32, 5)
+        self.drop1 = nn.Dropout(0.2)
         self.init_weights()
+        self.pool = nn.MaxPool2d(kernel_size = 2, stride = 2 )
         #
 
         self.init_weights()
@@ -42,6 +44,7 @@ class Challenge(nn.Module):
 
         # TODO:
         N, C, H, W = x.shape
+        #X = self.pool(x)
         X = x
         z = []
             #print(X)
@@ -49,11 +52,13 @@ class Challenge(nn.Module):
         activate = nn.LeakyReLU()
         X = self.conv1(X)
         X = activate(X)
+        X = self.pool(X)
         X = F.relu(self.conv2(X))
         X = F.relu(self.conv3(X))
         X = X.view(-1, 32*4*4)
         X = self.fc1(X)
         X = F.relu(X)
+        X = self.drop1(X)
         X = self.fc2(X)
         X = F.relu(X)
         X = self.fc3(X)

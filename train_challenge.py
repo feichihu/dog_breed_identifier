@@ -20,6 +20,7 @@ def _train_epoch(data_loader, model, criterion, optimizer):
     Use `optimizer` to optimize the specified `criterion`
     """
     # TODO: complete the training step
+    model.train()
     for i, (X, y) in enumerate(data_loader):
         # clear parameter gradients
         optimizer.zero_grad()
@@ -34,6 +35,7 @@ def _train_epoch(data_loader, model, criterion, optimizer):
     #
 
 def _evaluate_epoch(axes, tr_loader, val_loader, model, criterion, epoch, stats):
+    model.eval()
     with torch.no_grad():
         y_true, y_pred = [], []
         correct, total = 0, 0
