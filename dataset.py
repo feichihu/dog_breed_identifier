@@ -151,6 +151,8 @@ class DogsDataset(Dataset):
         X, y = [], []
         for i, row in df.iterrows():
             label = row['numeric_label']
+            #print(config('image_path'))
+            #print(row)
             image = imread(os.path.join(config('image_path'), row['filename']))
             X.append(image)
             y.append(row['numeric_label'])
