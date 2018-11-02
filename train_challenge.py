@@ -76,7 +76,7 @@ def main():
     # TODO: define model, loss function, and optimizer
     model = Challenge()
     criterion = torch.nn.CrossEntropyLoss()
-    #optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+    #optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
     #optimizer = torch.optim.SGD(model.parameters(), lr=0.005, momentum = 0.9)
     optimizer = torch.optim.ASGD(model.parameters(), lr=0.01, lambd=0.001, alpha=0.75, t0=1000000.0, weight_decay=0)
     #

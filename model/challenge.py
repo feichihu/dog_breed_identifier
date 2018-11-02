@@ -22,6 +22,7 @@ class Challenge(nn.Module):
         self.fc2 = nn.Linear(64, 32)
         self.fc3 = nn.Linear(32, 5)
         self.drop1 = nn.Dropout(0.2)
+        self.drop2 = nn.Dropout(0.2)
         self.init_weights()
         self.pool = nn.MaxPool2d(kernel_size = 2, stride = 2 )
         #
@@ -61,6 +62,7 @@ class Challenge(nn.Module):
         X = self.drop1(X)
         X = self.fc2(X)
         X = F.relu(X)
+        X = self.drop2(X)
         X = self.fc3(X)
         #
 

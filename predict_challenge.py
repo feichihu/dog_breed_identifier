@@ -17,6 +17,7 @@ from train_common import *
 from utils import config
 
 def predict_challenge(data_loader, model):
+    model.eval()
     """
     Runs the model inference on the test set and outputs the predictions
     """
